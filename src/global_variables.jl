@@ -7,16 +7,18 @@ const lpm = 1.666666e-5
 const bufferlength = 400
 
 const path, outfile = let 
-    a = pwd() |> x->split(x,"/")
+    a = pwd() |> x->split(x,"\\")
     datestr = Dates.format(now(), "yyyymmdd")
-    path = mapreduce(a->"/"*a,*,a[2:3])*"/Data/CS Daq/"*datestr
-    read(`mkdir -p $path`)
+    path = "C:\\"*a[2]*a[3]*"\\Documents\\Data\\CS Daq\\"*datestr
+    #read(`mkdir -p $path`)
     path, "CS_"*datestr*".csv" 
 end
 
+const currentSavePath = Signal("C:\\Users\\shd-analy-2\\Documents\\Data\\CS Daq\\Misc\\")
+mkpath(currentSavePath.value)
+
 const rampTE1 = Reactive.Signal(false)
 const stateTE1 = Reactive.Signal(:Manual)
-const currentImage = Signal(ThorlabsDCC1545M.capture())
 const imgCounter = Signal(1)
 const currentT = Signal(0.0)
 

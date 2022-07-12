@@ -17,19 +17,12 @@ function sampleHz_data_file()
 end
 
 function sampleHz_disp_image()
-    #img =  Gray.((reshape(currentImage.value, 1280, 1024)./0xff)')
-    #simg = restrict(img)
-    #imshow!(c, simg)
-
     mode = get_gtk_property(te1Mode, "active-id", String) |> Symbol
     if mode == :Ramp
-        str = get_gtk_property(gui["Experiment"], :text, String)
-        imgpath = path*"/"*str
-        read(`mkdir -p $imgpath`)
-        str1 = @sprintf("/pic_%04i_",imgCounter.value)
+        str1 = @sprintf("pic_%04i_",imgCounter.value)
         str2 = Dates.format(now(), "yyyymmddTHHMMSS")
-        str3 = @sprintf("_%.2f_.jpg", currentT.value)
-        Images.save(imgpath*str1*str2*str3, img)
+        str3 = @sprintf("_%.2f.jpg", currentT.value)
+        IDS_peak.save_image(currentImage1.value, currentSavePath.value*str1*str2*str3)
         push!(imgCounter, imgCounter.value+1)
     else
         push!(imgCounter, 1)
@@ -85,7 +78,7 @@ function sampleHz_generic_loop()
     TE1_T1 = TETechTC3625RS232.read_sensor_T1(portTE1)
     TE1_T2 = TETechTC3625RS232.read_sensor_T2(portTE1)
     Tcur = 0.5*(TE1_T1 + TE1_T2)
-    ismissing(Tcur) || push!(currentT, Tcur)
+    ismissing(Tcur) || push!(currentT, TE1_T1)
     Power = TETechTC3625RS232.read_power_output(portTE1)
     TETechTC3625RS232.set_temperature(portTE1, TE1setT.value)
      
@@ -96,5 +89,5 @@ function sampleHz_generic_loop()
     set_gtk_property!(gui["TE1PowerOutput"],:text,parse_missing1(Power))
     addpoint!(t,TE1setT.value,plotTemp,gplotTemp,1,true)
 	(typeof(TE1_T1) == Missing) || addpoint!(t,TE1_T1,plotTemp,gplotTemp,2,true)
-    (typeof(TE1_T2) == Missing) || addpoint!(t,TE1_T2,plotTemp,gplotTemp,3,true)
+    #(typeof(TE1_T2) == Missing) || addpoint!(t,TE1_T2,plotTemp,gplotTemp,3,true)
 end    

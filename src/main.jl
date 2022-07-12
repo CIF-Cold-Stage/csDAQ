@@ -14,8 +14,7 @@ using Statistics
 using ImageView
 using Images
 using TETechTC3625RS232
-using ThorlabsDCC1545M
-#sudo systemctl enable ueyeusbdrc
+using IDS_peak
 
 (@isdefined wnd) && destroy(wnd)
 gui = GtkBuilder(filename=pwd()*"/gui.glade")  # Load GUI
@@ -26,7 +25,7 @@ c = canvas(UserUnit)
 push!(cvs, c)
 
 serialPort = get_gtk_property(gui["TESerialPort1"], "text", String)
-(@isdefined portTE1) || (portTE1 = TETechTC3625RS232.configure_port(serialPort))
+(@isdefined portTE1) || (portTE1 = TETechTC3625RS232.configure_port("COM3"))
 TETechTC3625RS232.turn_power_off(portTE1)
 
 include("global_variables.jl")        # Reactive Signals and global variables
@@ -53,17 +52,23 @@ end
     
 MainLoop = map(_ -> main(), sampleHz)   # Run Master Loop
 
+IDS_peak.initialize_camera()
+IDS_peak.open_camera()
+IDS_peak.prepare_acquisition()
+IDS_peak.alloc_and_announce_buffers()
+IDS_peak.start_acquisition(2)
+
+const currentImage1 = Signal(IDS_peak.acquire_image())
+
 a = true
 @async while a == true
-    push!(currentImage, ThorlabsDCC1545M.capture())
-    sleep(0.1)
+    push!(currentImage1, IDS_peak.acquire_image());
+    sleep(0.5)
 end  
 
-theImage = throttle(0.5, currentImage)
-
-imgsig = map(theImage) do r
-	img = Gray.((reshape(r, 1280, 1024)./0xff)')
-    view(img, 1:1024, 1:1280)
+imgsig = map(currentImage1) do r
+	img =IDS_peak.image_preview(currentImage1.value)
+    view(img, 1:973, 1:1297)
 end
 
 redraw = draw(c, imgsig) do cnvs, image
@@ -84,5 +89,5 @@ push!(updateThermistor, true)
 sleep(1)
 push!(updatePolarity, true) 
 
-wait(Godot)
-ThorlabsDCC1545M.close()
+
+#IDS_peak.close()

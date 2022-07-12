@@ -1,7 +1,15 @@
 te1Mode = gui["TE1Mode"]
 signal_connect(te1Mode, "changed") do widget, others...
-	push!(stateTE1,get_gtk_property(te1Mode, "active-id", String) |> Symbol)	
-end
+	push!(stateTE1,get_gtk_property(te1Mode, "active-id", String) |> Symbol)
+    println(stateTE1.value)
+    if stateTE1.value == :Ramp
+        str1 = Dates.format(now(), "yyyymmddTHHMMSS")
+        str2 = get_gtk_property(gui["Experiment"], :text, String)
+        base = "C:\\Users\\shd-analy-2\\Documents\\Data\\CS Daq\\"    
+        push!(currentSavePath, base*str1*"_"*str2*"\\")
+        mkpath(base*str1*"_"*str2*"\\")
+    end
+end 
 
 updatePower = Signal(false)
 te1Power = gui["power"]

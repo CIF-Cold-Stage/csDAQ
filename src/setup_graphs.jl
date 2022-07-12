@@ -1,7 +1,7 @@
 
 function graph1(yaxis)
 	plot = InspectDR.transientplot(yaxis, title="")
-	InspectDR.overwritefont!(plot.layout, fontname="Arial", fontscale=1.0)
+	InspectDR.overwritefont!(plot.layout, fontname="Sans", fontscale=1.0)
 	plot.layout[:enable_legend] = true
 	plot.layout[:halloc_legend] = 160
 	plot.layout[:halloc_left] = 50
@@ -26,7 +26,7 @@ end
 
 function graph2(yaxis)
 	plot = InspectDR.transientplot(yaxis, title="")
-	InspectDR.overwritefont!(plot.layout, fontname="Helvetica", fontscale=1.0)
+	InspectDR.overwritefont!(plot.layout, fontname="Sans", fontscale=1.0)
 	plot.layout[:enable_legend] = false
 	plot.layout[:enable_timestamp] = true
 	plot.layout[:length_tickmajor] = 10
